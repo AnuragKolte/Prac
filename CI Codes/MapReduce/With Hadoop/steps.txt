@@ -1,0 +1,99 @@
+📁 FILE STRUCTURE (Recommended):
+
+HadoopTextAnalysis/
+├── CharCount.java
+├── CharCountSimple.java
+├── WordCount.java
+├── WordCountSimple.java
+├── input/
+│   └── sample.txt
+└── output/
+
+
+
+⸻
+
+📌 STEP-BY-STEP GUIDE:
+
+🔹 Step 1: Set Up Hadoop
+
+# Check Hadoop is working
+hadoop version
+
+🔹 Step 2: Prepare Input File
+
+Create a sample text file:
+
+mkdir input
+echo "This is an apple. Apple is red in color." > input/sample.txt
+
+🔹 Step 3: Compile the Java Code
+
+# Compile your Java program
+javac -classpath `hadoop classpath` -d . CharCount.java
+javac -classpath `hadoop classpath` -d . WordCount.java
+
+🔹 Step 4: Create a JAR File
+
+jar -cvf charcount.jar *.class
+jar -cvf wordcount.jar *.class
+
+🔹 Step 5: Create HDFS Folders and Upload Input File
+
+hdfs dfs -mkdir /user
+hdfs dfs -mkdir /user/input
+hdfs dfs -put input/sample.txt /user/input/
+
+🔹 Step 6: Run the MapReduce Job
+
+For Character Count:
+
+hadoop jar charcount.jar CharCount /user/input /user/output_char
+
+For Word Count:
+
+hadoop jar wordcount.jar WordCount /user/input /user/output_word
+
+🔹 Step 7: View the Output
+
+hdfs dfs -cat /user/output_char/part-r-00000
+hdfs dfs -cat /user/output_word/part-r-00000
+
+
+
+⸻
+
+✅ CODE VERIFICATION
+
+🔍 CharCount.java – CHECKED ✅
+	•	Proper Mapper and Reducer classes.
+	•	Input: Character-wise splitting.
+	•	Output: Each character and its count.
+	•	✅ Valid and functional MapReduce code.
+
+🔍 WordCount.java – CHECKED ✅
+	•	Tokenizes input by whitespace using StringTokenizer.
+	•	Emits <word, 1> pairs in the Mapper.
+	•	Reducer sums up occurrences.
+	•	✅ Matches Hadoop’s canonical word count example.
+
+🔍 Simple Versions – CHECKED ✅
+	•	These are valid local Java programs not using Hadoop MapReduce.
+	•	You can run them with java directly for testing before deploying to Hadoop.
+
+⸻
+
+📌 BONUS TIPS
+
+🔧 To Clean Up:
+
+hdfs dfs -rm -r /user/output_char
+hdfs dfs -rm -r /user/output_word
+
+🧪 To Test on Local File System (Without Hadoop):
+
+You can run WordCountSimple.java and CharCountSimple.java locally via:
+
+javac WordCountSimple.java
+java WordCountSimple input/sample.txt
+

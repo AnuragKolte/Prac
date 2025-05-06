@@ -1,0 +1,68 @@
+1. Prepare Environment
+----------------------
+- Ensure Hadoop is installed and configured correctly.
+- Start HDFS and YARN daemons:
+  $ start-dfs.sh
+  $ start-yarn.sh
+
+- Verify services are running:
+  $ jps
+  # You should see NameNode, DataNode, ResourceManager, NodeManager, etc.
+
+2. Create Test Input Locally (Optional)
+---------------------------------------
+- Create a local input folder:
+  $ mkdir input
+
+- Add a sample file:
+  $ echo "This is an apple. Apple is red in color." > input/sample.txt
+
+- View the file content:
+  $ cat input/sample.txt
+
+3. Upload Input to HDFS
+-----------------------
+- Create a directory in HDFS:
+  $ hdfs dfs -mkdir -p /input
+
+- Upload the local file:
+  $ hdfs dfs -put input/sample.txt /input/
+
+- Confirm the upload:
+  $ hdfs dfs -ls /input
+
+4. Verify Your Python Scripts
+-----------------------------
+- Ensure `mapper.py` and `reducer.py` are present and executable:
+  $ chmod +x mapper.py reducer.py
+
+- (Optional) Test locally:
+  $ cat input/sample.txt | python3 mapper.py | sort | python3 reducer.py
+
+5. Run the Hadoop Streaming Job
+-------------------------------
+- Run the MapReduce job:
+  $ hadoop jar /usr/lib/hadoop/hadoop-streaming.jar \
+    -input /input/sample.txt \
+    -output /output_result \
+    -mapper "python3 mapper.py" \
+    -reducer "python3 reducer.py" \
+    -file mapper.py \
+    -file reducer.py
+
+- Update the path to the streaming JAR if it's different on your system.
+
+6. View Output
+--------------
+- Display the output:
+  $ hdfs dfs -cat /output_result/part-00000
+
+7. Clean Up (Optional)
+----------------------
+- Remove HDFS files:
+  $ hdfs dfs -rm -r /input
+  $ hdfs dfs -rm -r /output_result
+
+- Stop Hadoop services:
+  $ stop-yarn.sh
+  $ stop-dfs.sh 
